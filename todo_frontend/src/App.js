@@ -5,19 +5,18 @@ import './App.css';
  * Minimalistic React To-Do app UI that integrates with a backend REST API.
  * Theme colors: primary #1976D2, accent #FFB300, secondary #424242 (applied in CSS variables).
  * Backend URL is read from REACT_APP_API_URL, with a fallback to http://localhost:3001.
+ *
+ * PUBLIC INTERFACES:
+ * - App component is the single entry. Handlers are documented inline and exposed for UI interactions.
  */
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
-// Types
 /**
- * @typedef {Object} Task
- * @property {number} id
- * @property {string} title
- * @property {boolean} completed
+ * PUBLIC_INTERFACE
+ * Perform an HTTP JSON request with sensible defaults.
+ * Throws on non-2xx. Returns parsed JSON or null for 204 No Content responses.
  */
-
-// Helpers
 async function httpJson(url, options = {}) {
   const resp = await fetch(url, {
     headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
@@ -27,10 +26,18 @@ async function httpJson(url, options = {}) {
     const msg = await resp.text().catch(() => '');
     throw new Error(`HTTP ${resp.status}: ${msg || resp.statusText}`);
   }
-  // Some deletes may return empty
   if (resp.status === 204) return null;
-  return resp.json();
+  // Some backends may return no body on PUT; guard that.
+  const text = await resp.text();
+  return text ? JSON.parse(text) : null;
 }
+
+/**
+ * @typedef {Object} Task
+ * @property {number} id
+ * @property {string} title
+ * @property {boolean} completed
+ */
 
 // PUBLIC_INTERFACE
 function App() {
@@ -38,9 +45,8 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [newTitle, setNewTitle] = useState('');
-  const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] = useState(/** @type {number|null} */(null));
   const [editingTitle, setEditingTitle] = useState('');
-  const [theme] = useState('light'); // locked to light per requirement
 
   // Apply light theme to document root
   useEffect(() => {
@@ -50,17 +56,19 @@ function App() {
   // Load tasks on mount
   useEffect(() => {
     let mounted = true;
-    setLoading(true);
-    setError('');
-    httpJson(`${API_URL}/tasks/`)
-      .then((data) => {
+    (async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const data = await httpJson(`${API_URL}/tasks/`, { method: 'GET' });
         if (mounted) setTasks(Array.isArray(data) ? data : []);
-      })
-      .catch((e) => mounted && setError(`Failed to load tasks: ${e.message}`))
-      .finally(() => mounted && setLoading(false));
-    return () => {
-      mounted = false;
-    };
+      } catch (e) {
+        if (mounted) setError(`Failed to load tasks: ${e.message}`);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
   }, []);
 
   const hasTasks = useMemo(() => tasks && tasks.length > 0, [tasks]);
@@ -76,7 +84,9 @@ function App() {
         method: 'POST',
         body: JSON.stringify({ title, completed: false }),
       });
-      setTasks((prev) => [created, ...prev]);
+      if (created) {
+        setTasks((prev) => [created, ...prev]);
+      }
       setNewTitle('');
     } catch (e) {
       setError(`Create failed: ${e.message}`);
@@ -91,7 +101,9 @@ function App() {
         method: 'PUT',
         body: JSON.stringify({ completed: !task.completed }),
       });
-      setTasks((prev) => prev.map((t) => (t.id === task.id ? updated : t)));
+      setTasks((prev) =>
+        prev.map((t) => (t.id === task.id ? (updated ?? { ...t, completed: !t.completed }) : t))
+      );
     } catch (e) {
       setError(`Update failed: ${e.message}`);
     }
@@ -119,7 +131,9 @@ function App() {
         method: 'PUT',
         body: JSON.stringify({ title }),
       });
-      setTasks((prev) => prev.map((t) => (t.id === taskId ? updated : t)));
+      setTasks((prev) =>
+        prev.map((t) => (t.id === taskId ? (updated ?? { ...t, title }) : t))
+      );
       cancelEdit();
     } catch (e) {
       setError(`Save failed: ${e.message}`);
@@ -149,8 +163,8 @@ function App() {
       </header>
 
       <main className="content">
-        <section className="card">
-          <form className="task-input" onSubmit={createTask}>
+        <section className="card" aria-label="To-Do list card">
+          <form className="task-input" onSubmit={createTask} aria-label="Create task form">
             <input
               type="text"
               className="input"
@@ -159,12 +173,12 @@ function App() {
               onChange={(e) => setNewTitle(e.target.value)}
               aria-label="Task title"
             />
-            <button type="submit" className="btn btn-primary" disabled={!newTitle.trim()}>
+            <button type="submit" className="btn btn-primary" disabled={!newTitle.trim()} aria-label="Add task">
               Add
             </button>
           </form>
 
-          {error && <div className="alert">{error}</div>}
+          {error && <div className="alert" role="alert">{error}</div>}
           {loading && <div className="muted">Loading...</div>}
 
           {!loading && !hasTasks && <div className="empty">No tasks yet. Add your first one!</div>}
@@ -195,9 +209,10 @@ function App() {
                           if (e.key === 'Enter') saveEdit(task.id);
                           if (e.key === 'Escape') cancelEdit();
                         }}
+                        aria-label="Edit task title"
                       />
                     ) : (
-                      <span className="task-title">{task.title}</span>
+                      <span className="task-title" title={task.title}>{task.title}</span>
                     )}
                   </div>
 
