@@ -1,104 +1,228 @@
-/* CSS Variables for Theme Management */
+/* Light, minimalistic theme using provided palette */
 :root {
-  /* Light theme colors */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --text-primary: #282c34;
-  --text-secondary: #61dafb;
-  --border-color: #e9ecef;
-  --button-bg: #007bff;
-  --button-text: #ffffff;
+  --primary: #1976D2;   /* primary */
+  --accent: #FFB300;    /* accent */
+  --secondary: #424242; /* secondary */
+  --bg: #ffffff;
+  --surface: #f7f9fc;
+  --border: #e6e8ef;
+  --text: #1f2937;
+  --text-muted: #6b7280;
+  --danger: #e53935;
 }
 
-[data-theme="dark"] {
-  /* Dark theme colors */
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #282c34;
-  --text-primary: #ffffff;
-  --text-secondary: #61dafb;
-  --border-color: #404040;
-  --button-bg: #0056b3;
-  --button-text: #ffffff;
+* { box-sizing: border-box; }
+
+html, body, #root, .App {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.4;
 }
 
 .App {
-  text-align: center;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  min-height: 100vh;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: var(--bg-secondary);
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: var(--text-primary);
-  transition: background-color 0.3s ease;
-  position: relative;
+  min-height: 100vh;
 }
 
-.App-link {
-  color: var(--text-secondary);
-  transition: color 0.3s ease;
+/* Header */
+.header {
+  background: linear-gradient(180deg, var(--primary), #1a67b6);
+  color: #fff;
+  padding: 32px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
 }
-
-.theme-toggle {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background-color: var(--button-bg);
-  color: var(--button-text);
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
+.header__content {
+  max-width: 720px;
+  margin: 0 auto;
+}
+.header__title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+.header__subtitle {
+  margin: 6px 0 0 0;
+  color: rgba(255,255,255,0.9);
   font-size: 14px;
-  font-weight: 600;
+}
+
+/* Content card */
+.content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px 32px;
+  background: var(--surface);
+}
+.card {
+  width: 100%;
+  max-width: 720px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 6px 24px rgba(31, 41, 55, 0.06);
+}
+
+/* Input area */
+.task-input {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+}
+.input {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--text);
+  background: #fff;
+  outline: none;
+}
+.input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
+}
+.input-inline {
+  width: 100%;
+}
+
+/* Buttons */
+.btn {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.05s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
 }
-
-.theme-toggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  opacity: 0.9;
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(31, 41, 55, 0.08);
 }
-
-.theme-toggle:active {
+.btn:active {
   transform: translateY(0);
+  box-shadow: none;
+}
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.btn-ghost {
+  background: #fff;
+  color: var(--secondary);
+}
+.btn-danger {
+  background: #fff5f5;
+  color: var(--danger);
+  border-color: #ffd6d6;
+}
+.btn-small {
+  padding: 6px 10px;
+  font-size: 13px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Alerts and helpers */
+.alert {
+  margin-top: 12px;
+  background: #fff8e1;
+  border: 1px solid #ffe0a3;
+  color: #8a5a00;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.muted {
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.empty {
+  margin: 16px 0 4px 0;
+  color: var(--text-muted);
+  font-size: 14px;
+  text-align: center;
 }
 
-/* Responsive design for mobile */
-@media (max-width: 768px) {
-  .theme-toggle {
-    top: 10px;
-    right: 10px;
-    padding: 8px 16px;
-    font-size: 12px;
-  }
+/* Task list */
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0 0;
+}
+.task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  margin-top: 10px;
+}
+.task-item.completed .task-title {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+.task-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+.task-title {
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.task-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Status chip (complete/incomplete toggle) */
+.chip {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: #fff;
+  color: var(--secondary);
+  font-size: 13px;
+  cursor: pointer;
+}
+.chip-open {
+  background: #fff;
+}
+.chip-complete {
+  background: #e8f4ff;
+  color: var(--primary);
+  border-color: #c9e5ff;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  justify-content: center;
+  padding: 14px 16px 24px;
+  color: var(--text-muted);
+  font-size: 12px;
 }
