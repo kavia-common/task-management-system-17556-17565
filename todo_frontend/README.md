@@ -3,10 +3,10 @@
 Minimalistic, light-themed React UI for the To-Do app. It connects to the backend REST API to create, read, update, and delete tasks.
 
 ## Features
-- Task creation
+- Task creation (with priority: High/Medium/Low)
 - View to-do list
 - Mark task as completed
-- Edit task title
+- Edit task title and priority
 - Delete task
 
 ## Quick start
@@ -30,6 +30,7 @@ Minimalistic, light-themed React UI for the To-Do app. It connects to the backen
 - No UI framework, pure CSS
 
 ## Notes
+- Priority is mocked client-side if the backend does not yet persist it; the UI remains fully functional.
 - The theme is intentionally light and minimalistic using:
   - primary: #1976D2
   - accent:  #FFB300
